@@ -8,7 +8,7 @@ import org.raphets.roundimageview.RoundImageView;
 
 public class MainActivity extends AppCompatActivity {
 
-    private RoundImageView iv1,iv2,iv3;
+    private RoundImageView iv1,iv2,iv3,iv4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,8 +18,9 @@ public class MainActivity extends AppCompatActivity {
         iv1= (RoundImageView) findViewById(R.id.iv1);
         iv2= (RoundImageView) findViewById(R.id.iv2);
         iv3= (RoundImageView) findViewById(R.id.iv3);
+        iv4= (RoundImageView) findViewById(R.id.iv4);
 
-        iv2.setBorderColor(Color.YELLOW);
+        iv4.setImageResource(R.drawable.a);
 
         Picasso.with(this)
                 .load("http://ww2.sinaimg.cn/large/610dc034jw1fa42ktmjh4j20u011hn8g.jpg")

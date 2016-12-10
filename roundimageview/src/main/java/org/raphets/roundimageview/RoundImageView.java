@@ -8,16 +8,18 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.widget.ImageView;
 
 /**
- *  圆形、圆角图片
+ * 圆形、圆角图片
  */
 
 public class RoundImageView extends ImageView {
@@ -35,9 +37,17 @@ public class RoundImageView extends ImageView {
     private float mBorderWidth;
     /**
      * 圆角的大小
-     *
      */
     private float mCornerRadius;
+    //左上角圆角大小
+    private float mLeftTopCornerRadius;
+    //右上角圆角大小
+    private float mRightTopCornerRadius;
+    //左下角圆角大小
+    private float mLeftBottomCornerRadius;
+    //右下角圆角大小
+    private float mRightBottomCornerRadius;
+
     /**
      * 绘图的Paint
      */
@@ -64,6 +74,8 @@ public class RoundImageView extends ImageView {
      */
     private RectF mRoundRect;
 
+    private Path mRoundPath;
+
 
     public RoundImageView(Context context) {
         this(context, null);
@@ -81,9 +93,11 @@ public class RoundImageView extends ImageView {
         type = a.getInt(R.styleable.RoundImageView_type, TYPE_OVAL);
         mBorderColor = a.getColor(R.styleable.RoundImageView_border_color, Color.WHITE);
         mBorderWidth = a.getDimension(R.styleable.RoundImageView_border_width, 0);
-
-        mCornerRadius = a.getDimension(R.styleable.RoundImageView_corner_radius, dp2px(8));
-
+        mCornerRadius = a.getDimension(R.styleable.RoundImageView_corner_radius, dp2px(10));
+        mLeftTopCornerRadius = a.getDimension(R.styleable.RoundImageView_leftTop_corner_radius, 0);
+        mLeftBottomCornerRadius = a.getDimension(R.styleable.RoundImageView_leftBottom_corner_radius,0);
+        mRightTopCornerRadius = a.getDimension(R.styleable.RoundImageView_rightTop_corner_radius,0);
+        mRightBottomCornerRadius = a.getDimension(R.styleable.RoundImageView_rightBottom_corner_radius,0);
 
         a.recycle();
 
@@ -92,7 +106,7 @@ public class RoundImageView extends ImageView {
     }
 
     private void init() {
-
+        mRoundPath = new Path();
         mMatrix = new Matrix();
         mBitmapPaint = new Paint();
         mBitmapPaint.setAntiAlias(true);
@@ -110,7 +124,7 @@ public class RoundImageView extends ImageView {
          */
         if (type == TYPE_CIRCLE) {
             mWidth = Math.min(getMeasuredWidth(), getMeasuredHeight());
-            mRadius = mWidth / 2 - mBorderWidth;
+            mRadius = mWidth / 2 - mBorderWidth/2;
             setMeasuredDimension(mWidth, mWidth);
         }
 
@@ -120,8 +134,8 @@ public class RoundImageView extends ImageView {
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
         // 圆角图片的范围
-        if (type == TYPE_ROUND||type==TYPE_OVAL) {
-            mRoundRect = new RectF(mBorderWidth, mBorderWidth, w - mBorderWidth, h - mBorderWidth);
+        if (type == TYPE_ROUND || type == TYPE_OVAL) {
+            mRoundRect = new RectF(mBorderWidth/2, mBorderWidth/2, w - mBorderWidth/2, h - mBorderWidth/2);
         }
     }
 
@@ -137,22 +151,54 @@ public class RoundImageView extends ImageView {
         setUpShader();
 
         if (type == TYPE_ROUND) {
-            canvas.drawRoundRect(mRoundRect, mCornerRadius, mCornerRadius, mBitmapPaint);
+            setRoundPath();
+
+            canvas.drawPath(mRoundPath, mBitmapPaint);
 
             //绘制描边
-            canvas.drawRoundRect(mRoundRect, mCornerRadius, mCornerRadius, mBorderPaint);
-
-        } else if (type==TYPE_CIRCLE){
-            canvas.drawCircle(mRadius + mBorderWidth, mRadius + mBorderWidth, mRadius, mBitmapPaint);
+            canvas.drawPath(mRoundPath, mBorderPaint);
+        } else if (type == TYPE_CIRCLE) {
+            canvas.drawCircle(mRadius + mBorderWidth/2, mRadius + mBorderWidth/2, mRadius, mBitmapPaint);
 
             //绘制描边
-            canvas.drawCircle(mRadius + mBorderWidth, mRadius + mBorderWidth, mRadius, mBorderPaint);
+            canvas.drawCircle(mRadius + mBorderWidth/2, mRadius + mBorderWidth/2, mRadius, mBorderPaint);
+
+        } else {
+            canvas.drawOval(mRoundRect, mBitmapPaint);
+
+            canvas.drawOval(mRoundRect, mBorderPaint);
+        }
+    }
+
+
+    private void setRoundPath() {
+        mRoundPath.reset();
+
+        /**
+         * 如果四个圆角大小都是默认值0，
+         * 则将四个圆角大小设置为mCornerRadius的值
+         */
+        if (mLeftTopCornerRadius==0&&
+                mLeftBottomCornerRadius==0&&
+                mRightTopCornerRadius==0&&
+                mRightBottomCornerRadius==0){
+
+            mRoundPath.addRoundRect(mRoundRect,
+                    new float[]{mCornerRadius, mCornerRadius,
+                            mCornerRadius, mCornerRadius,
+                            mCornerRadius, mCornerRadius,
+                            mCornerRadius, mCornerRadius},
+                    Path.Direction.CW);
 
         }else {
-            canvas.drawOval(mRoundRect,mBitmapPaint);
-
-            canvas.drawOval(mRoundRect,mBorderPaint);
+            mRoundPath.addRoundRect(mRoundRect,
+                    new float[]{mLeftTopCornerRadius, mLeftTopCornerRadius,
+                            mRightTopCornerRadius, mRightTopCornerRadius,
+                            mRightBottomCornerRadius, mRightBottomCornerRadius,
+                            mLeftBottomCornerRadius, mLeftBottomCornerRadius},
+                    Path.Direction.CW);
         }
+
     }
 
 
@@ -174,7 +220,7 @@ public class RoundImageView extends ImageView {
             int bSize = Math.min(bmp.getWidth(), bmp.getHeight());
             scale = mWidth * 1.0f / bSize;
 
-        } else if (type == TYPE_ROUND||type==TYPE_OVAL) {
+        } else if (type == TYPE_ROUND || type == TYPE_OVAL) {
 
             if (!(bmp.getWidth() == getWidth() && bmp.getHeight() == getHeight())) {
                 // 如果图片的宽或者高与view的宽高不匹配，计算出需要缩放的比例；缩放后的图片的宽高，一定要大于我们view的宽高；所以我们这里取大值；
@@ -193,7 +239,6 @@ public class RoundImageView extends ImageView {
 
     /**
      * drawable转bitmap
-     *
      */
     private Bitmap drawableToBitamp(Drawable drawable) {
         if (drawable instanceof BitmapDrawable) {
@@ -216,47 +261,103 @@ public class RoundImageView extends ImageView {
      * imageType=1 圆角图片
      * 默认为圆形图片
      */
-    public void setType(int imageType) {
+    public RoundImageView setType(int imageType) {
         if (this.type != imageType) {
             this.type = imageType;
-            if (this.type != TYPE_ROUND && this.type != TYPE_CIRCLE&& this.type != TYPE_OVAL) {
+            if (this.type != TYPE_ROUND && this.type != TYPE_CIRCLE && this.type != TYPE_OVAL) {
                 this.type = TYPE_OVAL;
             }
             requestLayout();
         }
+        return this;
     }
 
 
     /**
      * 设置圆角图片的圆角大小
      */
-    public void setCornerRadius(int cornerRadius) {
-        cornerRadius=dp2px(cornerRadius);
+    public RoundImageView setCornerRadius(int cornerRadius) {
+        cornerRadius = dp2px(cornerRadius);
         if (mCornerRadius != cornerRadius) {
             mCornerRadius = cornerRadius;
             invalidate();
         }
+        return this;
     }
+
+    /**
+     * 设置圆角图片的左上圆角大小
+     */
+    public RoundImageView setLeftTopCornerRadius(int cornerRadius) {
+        cornerRadius = dp2px(cornerRadius);
+        if (mLeftTopCornerRadius != cornerRadius) {
+            mLeftTopCornerRadius = cornerRadius;
+            invalidate();
+        }
+        return this;
+    }
+
+    /**
+     * 设置圆角图片的右上圆角大小
+     */
+    public RoundImageView setRightTopCornerRadius(int cornerRadius) {
+        cornerRadius = dp2px(cornerRadius);
+        if (mRightTopCornerRadius != cornerRadius) {
+            mRightTopCornerRadius = cornerRadius;
+            invalidate();
+        }
+        return this;
+    }
+
+    /**
+     * 设置圆角图片的左下圆角大小
+     */
+    public RoundImageView setLeftBottomCornerRadius(int cornerRadius) {
+        cornerRadius = dp2px(cornerRadius);
+        if (mLeftBottomCornerRadius != cornerRadius) {
+            mLeftBottomCornerRadius = cornerRadius;
+            invalidate();
+        }
+        return  this;
+    }
+
+    /**
+     * 设置圆角图片的右下圆角大小
+     */
+    public RoundImageView setRightBottomCornerRadius(int cornerRadius) {
+        cornerRadius = dp2px(cornerRadius);
+        if (mRightBottomCornerRadius != cornerRadius) {
+            mRightBottomCornerRadius = cornerRadius;
+            invalidate();
+        }
+
+        return this;
+    }
+
 
     /**
      * 设置描边宽度
      */
-    public void setBorderWidth(int borderWidth) {
-        borderWidth=dp2px(borderWidth);
+    public RoundImageView setBorderWidth(int borderWidth) {
+        borderWidth = dp2px(borderWidth);
         if (mBorderWidth != borderWidth) {
             mBorderWidth = borderWidth;
             invalidate();
         }
+
+        return  this;
     }
 
     /**
      * 设置描边颜色
      */
-    public void setBorderColor(int borderColor) {
+    public RoundImageView setBorderColor(int borderColor) {
         if (mBorderColor != borderColor) {
             mBorderColor = borderColor;
             invalidate();
         }
+
+        return this;
     }
 
     private int dp2px(int dpVal) {

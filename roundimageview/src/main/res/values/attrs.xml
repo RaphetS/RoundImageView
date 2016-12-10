@@ -7,6 +7,14 @@
         <attr name="border_color" format="color"/>
         <!--圆角大小-->
         <attr name="corner_radius" format="dimension"/>
+        <!--左上圆角大小-->
+        <attr name="leftTop_corner_radius" format="dimension"/>
+        <!--右上圆角大小-->
+        <attr name="rightTop_corner_radius" format="dimension"/>
+        <!--左下圆角大小-->
+        <attr name="leftBottom_corner_radius" format="dimension"/>
+        <!--右下圆角大小-->
+        <attr name="rightBottom_corner_radius" format="dimension"/>
         <!--图片类型：圆角或者圆形-->
         <attr name="type" format="enum">
             <enum name="oval" value="2"/>
