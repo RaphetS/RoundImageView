@@ -16,19 +16,19 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         iv1= (RoundImageView) findViewById(R.id.iv1);
-        iv2= (RoundImageView) findViewById(R.id.iv2);
-        iv3= (RoundImageView) findViewById(R.id.iv3);
-        iv4= (RoundImageView) findViewById(R.id.iv4);
 
-        iv4.setImageResource(R.drawable.a);
+        iv1.setBorderWidth(3)
+                .setBorderColor(Color.RED)
+                .setType(RoundImageView.TYPE_ROUND)
+                .setLeftTopCornerRadius(0)
+                .setRightTopCornerRadius(10)
+                .setRightBottomCornerRadius(30)
+                .setLeftBottomCornerRadius(50);
 
         Picasso.with(this)
                 .load("http://ww2.sinaimg.cn/large/610dc034jw1fa42ktmjh4j20u011hn8g.jpg")
                 .into(iv1);
 
-        Picasso.with(this)
-                .load("http://ww2.sinaimg.cn/large/610dc034jw1fa42ktmjh4j20u011hn8g.jpg")
-                .into(iv3);
 
     }
 }
