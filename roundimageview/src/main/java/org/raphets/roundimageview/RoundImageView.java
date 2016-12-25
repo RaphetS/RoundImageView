@@ -122,7 +122,8 @@ public class RoundImageView extends ImageView {
          * 如果类型是圆形，则强制改变view的宽高一致，以小值为准
          */
         if (type == TYPE_CIRCLE) {
-            mWidth = Math.min(getMeasuredWidth(), getMeasuredHeight());
+            mWidth = Math.min(MeasureSpec.getSize(widthMeasureSpec),
+                    MeasureSpec.getSize(heightMeasureSpec));
             mRadius = mWidth / 2 - mBorderWidth/2;
             setMeasuredDimension(mWidth, mWidth);
         }
@@ -157,6 +158,7 @@ public class RoundImageView extends ImageView {
             //绘制描边
             canvas.drawPath(mRoundPath, mBorderPaint);
         } else if (type == TYPE_CIRCLE) {
+
             canvas.drawCircle(mRadius + mBorderWidth/2, mRadius + mBorderWidth/2, mRadius, mBitmapPaint);
 
             //绘制描边
