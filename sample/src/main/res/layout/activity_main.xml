@@ -12,26 +12,27 @@
         android:padding="10dp"
         android:orientation="vertical">
 
+
             <org.raphets.roundimageview.RoundImageView
                 android:layout_width="150dp"
                 android:layout_height="150dp"
-                android:src="@drawable/a"
+                android:src="@drawable/b"
                 app:border_color="@android:color/holo_red_light"
                 app:border_width="5dp"
                 app:type="circle" />
 
             <org.raphets.roundimageview.RoundImageView
                 android:layout_marginTop="10dp"
-                android:layout_width="200dp"
+                android:layout_width="100dp"
                 android:layout_height="150dp"
-                android:src="@drawable/a"
+                android:src="@drawable/b"
                 app:type="oval" />
 
             <org.raphets.roundimageview.RoundImageView
                 android:layout_marginTop="10dp"
                 android:layout_width="150dp"
                 android:layout_height="180dp"
-                android:src="@drawable/a"
+                android:src="@drawable/b"
                 app:border_color="@android:color/holo_blue_dark"
                 app:border_width="5dp"
                 app:corner_radius="10dp"

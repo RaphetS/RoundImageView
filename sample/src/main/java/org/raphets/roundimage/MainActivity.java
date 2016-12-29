@@ -15,7 +15,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        iv1= (RoundImageView) findViewById(R.id.iv1);
+        RoundImageView iv1= (RoundImageView) findViewById(R.id.iv1);
 
         iv1.setBorderWidth(3)
                 .setBorderColor(Color.RED)
