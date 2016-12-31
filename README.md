@@ -10,7 +10,7 @@
 
 ```
 dependencies {
-    compile 'org.raphets:roundimageview:1.1.0'
+    compile 'org.raphets:roundimageview:1.2.0'
 }
 ```
 
