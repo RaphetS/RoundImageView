@@ -218,6 +218,9 @@ public class RoundImageView extends ImageView {
             return;
         }
         Bitmap bmp = drawableToBitmap(drawable);
+        if (bmp == null) {
+            return;
+        }
         // 将bmp作为着色器，就是在指定区域内绘制bmp
         mBitmapShader = new BitmapShader(bmp, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
         mMatrix.setTranslate(0, 0);
@@ -262,10 +265,14 @@ public class RoundImageView extends ImageView {
         }
         int w = drawable.getIntrinsicWidth();
         int h = drawable.getIntrinsicHeight();
-        Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        drawable.setBounds(0, 0, w, h);
-        drawable.draw(canvas);
+        Bitmap bitmap = null;
+        try {
+            bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bitmap);
+            drawable.setBounds(0, 0, w, h);
+            drawable.draw(canvas);
+        } catch (OutOfMemoryError ignore) {
+        }
         return bitmap;
     }
 
