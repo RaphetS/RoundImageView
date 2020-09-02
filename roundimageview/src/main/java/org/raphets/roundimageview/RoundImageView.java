@@ -75,6 +75,7 @@ public class RoundImageView extends ImageView {
 
     private Path mRoundPath;
 
+    private boolean useUnitDip = true;
 
     public RoundImageView(Context context) {
         this(context, null);
@@ -94,24 +95,31 @@ public class RoundImageView extends ImageView {
         mBorderWidth = a.getDimension(R.styleable.RoundImageView_border_width, 0);
         mCornerRadius = a.getDimension(R.styleable.RoundImageView_corner_radius, dp2px(10));
         mLeftTopCornerRadius = a.getDimension(R.styleable.RoundImageView_leftTop_corner_radius, 0);
-        mLeftBottomCornerRadius = a.getDimension(R.styleable.RoundImageView_leftBottom_corner_radius,0);
-        mRightTopCornerRadius = a.getDimension(R.styleable.RoundImageView_rightTop_corner_radius,0);
-        mRightBottomCornerRadius = a.getDimension(R.styleable.RoundImageView_rightBottom_corner_radius,0);
+        mLeftBottomCornerRadius = a.getDimension(R.styleable.RoundImageView_leftBottom_corner_radius, 0);
+        mRightTopCornerRadius = a.getDimension(R.styleable.RoundImageView_rightTop_corner_radius, 0);
+        mRightBottomCornerRadius = a.getDimension(R.styleable.RoundImageView_rightBottom_corner_radius, 0);
 
         a.recycle();
 
         init();
-
     }
 
     private void init() {
         mRoundPath = new Path();
+        mRoundRect = new RectF();
         mMatrix = new Matrix();
         mBitmapPaint = new Paint();
         mBitmapPaint.setAntiAlias(true);
         mBorderPaint = new Paint();
         mBorderPaint.setAntiAlias(true);
         mBorderPaint.setStyle(Paint.Style.STROKE);
+
+        updateStrokePaint();
+    }
+
+    private void updateStrokePaint() {
+        mBorderPaint.setColor(mBorderColor);
+        mBorderPaint.setStrokeWidth(mBorderWidth);
     }
 
     @Override
@@ -124,10 +132,9 @@ public class RoundImageView extends ImageView {
         if (type == TYPE_CIRCLE) {
             mWidth = Math.min(MeasureSpec.getSize(widthMeasureSpec),
                     MeasureSpec.getSize(heightMeasureSpec));
-            mRadius = mWidth / 2 - mBorderWidth/2;
+            mRadius = mWidth / 2 - mBorderWidth / 2;
             setMeasuredDimension(mWidth, mWidth);
         }
-
     }
 
     @Override
@@ -135,20 +142,16 @@ public class RoundImageView extends ImageView {
         super.onSizeChanged(w, h, oldw, oldh);
         // 圆角图片的范围
         if (type == TYPE_ROUND || type == TYPE_OVAL) {
-            mRoundRect = new RectF(mBorderWidth/2, mBorderWidth/2, w - mBorderWidth/2, h - mBorderWidth/2);
+            mRoundRect.set(mBorderWidth / 2, mBorderWidth / 2, w - mBorderWidth / 2, h - mBorderWidth / 2);
         }
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-
-        mBorderPaint.setColor(mBorderColor);
-        mBorderPaint.setStrokeWidth(mBorderWidth);
-
         if (getDrawable() == null) {
             return;
         }
-        setUpShader();
+        setupShader();
 
         if (type == TYPE_ROUND) {
             setRoundPath();
@@ -156,33 +159,37 @@ public class RoundImageView extends ImageView {
             canvas.drawPath(mRoundPath, mBitmapPaint);
 
             //绘制描边
-            canvas.drawPath(mRoundPath, mBorderPaint);
+            if (mBorderWidth > 0) {
+                canvas.drawPath(mRoundPath, mBorderPaint);
+            }
         } else if (type == TYPE_CIRCLE) {
-
-            canvas.drawCircle(mRadius + mBorderWidth/2, mRadius + mBorderWidth/2, mRadius, mBitmapPaint);
+            canvas.drawCircle(mRadius + mBorderWidth / 2, mRadius + mBorderWidth / 2, mRadius, mBitmapPaint);
 
             //绘制描边
-            canvas.drawCircle(mRadius + mBorderWidth/2, mRadius + mBorderWidth/2, mRadius, mBorderPaint);
-
+            if (mBorderWidth > 0) {
+                canvas.drawCircle(mRadius + mBorderWidth / 2, mRadius + mBorderWidth / 2, mRadius, mBorderPaint);
+            }
         } else {
             canvas.drawOval(mRoundRect, mBitmapPaint);
 
-            canvas.drawOval(mRoundRect, mBorderPaint);
+            //绘制描边
+            if (mBorderWidth > 0) {
+                canvas.drawOval(mRoundRect, mBorderPaint);
+            }
         }
     }
 
 
     private void setRoundPath() {
         mRoundPath.reset();
-
         /**
          * 如果四个圆角大小都是默认值0，
          * 则将四个圆角大小设置为mCornerRadius的值
          */
-        if (mLeftTopCornerRadius==0&&
-                mLeftBottomCornerRadius==0&&
-                mRightTopCornerRadius==0&&
-                mRightBottomCornerRadius==0){
+        if (mLeftTopCornerRadius == 0 &&
+                mLeftBottomCornerRadius == 0 &&
+                mRightTopCornerRadius == 0 &&
+                mRightBottomCornerRadius == 0) {
 
             mRoundPath.addRoundRect(mRoundRect,
                     new float[]{mCornerRadius, mCornerRadius,
@@ -191,7 +198,7 @@ public class RoundImageView extends ImageView {
                             mCornerRadius, mCornerRadius},
                     Path.Direction.CW);
 
-        }else {
+        } else {
             mRoundPath.addRoundRect(mRoundRect,
                     new float[]{mLeftTopCornerRadius, mLeftTopCornerRadius,
                             mRightTopCornerRadius, mRightTopCornerRadius,
@@ -199,50 +206,45 @@ public class RoundImageView extends ImageView {
                             mLeftBottomCornerRadius, mLeftBottomCornerRadius},
                     Path.Direction.CW);
         }
-
     }
 
 
     /**
      * 初始化BitmapShader
      */
-    private void setUpShader() {
-
+    private void setupShader() {
         Drawable drawable = getDrawable();
         if (drawable == null) {
             return;
         }
-
-        Bitmap bmp = drawableToBitamp(drawable);
+        Bitmap bmp = drawableToBitmap(drawable);
         // 将bmp作为着色器，就是在指定区域内绘制bmp
         mBitmapShader = new BitmapShader(bmp, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
+        mMatrix.setTranslate(0, 0);
         float scale = 1.0f;
         if (type == TYPE_CIRCLE) {
-            // 拿到bitmap宽或高的小值
-            int bSize = Math.min(bmp.getWidth(), bmp.getHeight());
-            scale = mWidth * 1.0f / bSize;
-            //使缩放后的图片居中
-            float  dx = (bmp.getWidth()*scale - mWidth) / 2;
-            float dy = (bmp.getHeight()*scale - mWidth) / 2;
-            mMatrix.setTranslate(-dx, -dy);
-
+            if (bmp.getWidth() != getWidth() || bmp.getHeight() != getHeight()) {
+                // 拿到bitmap宽或高的小值
+                int bSize = Math.min(bmp.getWidth(), bmp.getHeight());
+                scale = mWidth * 1.0f / bSize;
+                //使缩放后的图片居中
+                float dx = (bmp.getWidth() * scale - mWidth) / 2;
+                float dy = (bmp.getHeight() * scale - mWidth) / 2;
+                mMatrix.setTranslate(-dx, -dy);
+            }
         } else if (type == TYPE_ROUND || type == TYPE_OVAL) {
-
-            if (!(bmp.getWidth() == getWidth() && bmp.getHeight() == getHeight())) {
+            if (bmp.getWidth() != getWidth() || bmp.getHeight() != getHeight()) {
                 // 如果图片的宽或者高与view的宽高不匹配，计算出需要缩放的比例；缩放后的图片的宽高，一定要大于我们view的宽高；所以我们这里取大值；
                 scale = Math.max(getWidth() * 1.0f / bmp.getWidth(),
                         getHeight() * 1.0f / bmp.getHeight());
                 //使缩放后的图片居中
-                float dx= (scale*bmp.getWidth()-getWidth())/2;
-                float dy= (scale*bmp.getHeight()-getHeight())/2;
-                mMatrix.setTranslate(-dx,-dy);
+                float dx = (scale * bmp.getWidth() - getWidth()) / 2;
+                float dy = (scale * bmp.getHeight() - getHeight()) / 2;
+                mMatrix.setTranslate(-dx, -dy);
             }
         }
         // shader的变换矩阵，我们这里主要用于放大或者缩小
         mMatrix.preScale(scale, scale);
-
-        mBitmapShader.setLocalMatrix(mMatrix);
-
         // 设置变换矩阵
         mBitmapShader.setLocalMatrix(mMatrix);
         // 设置shader
@@ -253,7 +255,7 @@ public class RoundImageView extends ImageView {
     /**
      * drawable转bitmap
      */
-    private Bitmap drawableToBitamp(Drawable drawable) {
+    private Bitmap drawableToBitmap(Drawable drawable) {
         if (drawable instanceof BitmapDrawable) {
             BitmapDrawable bd = (BitmapDrawable) drawable;
             return bd.getBitmap();
@@ -331,7 +333,7 @@ public class RoundImageView extends ImageView {
             mLeftBottomCornerRadius = cornerRadius;
             invalidate();
         }
-        return  this;
+        return this;
     }
 
     /**
@@ -355,10 +357,11 @@ public class RoundImageView extends ImageView {
         borderWidth = dp2px(borderWidth);
         if (mBorderWidth != borderWidth) {
             mBorderWidth = borderWidth;
+            updateStrokePaint();
             invalidate();
         }
 
-        return  this;
+        return this;
     }
 
     /**
@@ -367,6 +370,7 @@ public class RoundImageView extends ImageView {
     public RoundImageView setBorderColor(int borderColor) {
         if (mBorderColor != borderColor) {
             mBorderColor = borderColor;
+            updateStrokePaint();
             invalidate();
         }
 
@@ -374,7 +378,18 @@ public class RoundImageView extends ImageView {
     }
 
     private int dp2px(int dpVal) {
+        if (!useUnitDip) {
+            return dpVal;
+        }
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 dpVal, getResources().getDisplayMetrics());
+    }
+
+    public boolean isUseUnitDip() {
+        return useUnitDip;
+    }
+
+    public void setUseUnitDip(boolean useUnitDip) {
+        this.useUnitDip = useUnitDip;
     }
 }
