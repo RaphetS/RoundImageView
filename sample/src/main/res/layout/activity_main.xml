@@ -9,47 +9,49 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center_horizontal"
-        android:padding="10dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="10dp">
 
 
-            <org.raphets.roundimageview.RoundImageView
-                android:layout_width="150dp"
-                android:layout_height="150dp"
-                android:src="@drawable/b"
-                app:border_color="@android:color/holo_red_light"
-                app:border_width="5dp"
-                app:type="circle" />
+        <org.raphets.roundimageview.RoundImageView
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:src="@drawable/a"
+            app:border_color="#00BCD4"
+            app:border_width="2dp"
+            app:type="circle" />
 
-            <org.raphets.roundimageview.RoundImageView
-                android:layout_marginTop="10dp"
-                android:layout_width="100dp"
-                android:layout_height="150dp"
-                android:src="@drawable/b"
-                app:type="oval" />
+        <org.raphets.roundimageview.RoundImageView
+            android:layout_width="100dp"
+            android:layout_height="150dp"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/a"
+            app:border_color="#F66798"
+            app:border_width="2dp"
+            app:type="oval" />
 
-            <org.raphets.roundimageview.RoundImageView
-                android:layout_marginTop="10dp"
-                android:layout_width="150dp"
-                android:layout_height="180dp"
-                android:src="@drawable/b"
-                app:border_color="@android:color/holo_blue_dark"
-                app:border_width="5dp"
-                app:corner_radius="10dp"
-                app:type="round" />
+        <org.raphets.roundimageview.RoundImageView
+            android:layout_width="150dp"
+            android:layout_height="180dp"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/b"
+            app:border_color="@android:color/holo_blue_dark"
+            app:border_width="0dp"
+            app:corner_radius="6dp"
+            app:type="round" />
 
-            <org.raphets.roundimageview.RoundImageView
-                android:layout_width="150dp"
-                android:layout_height="180dp"
-                android:layout_marginTop="10dp"
-                android:src="@drawable/a"
-                app:border_color="@android:color/black"
-                app:border_width="2dp"
-                app:leftBottom_corner_radius="20dp"
-                app:leftTop_corner_radius="0dp"
-                app:rightBottom_corner_radius="20dp"
-                app:rightTop_corner_radius="0dp"
-                app:type="round" />
+        <org.raphets.roundimageview.RoundImageView
+            android:layout_width="150dp"
+            android:layout_height="180dp"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/a"
+            app:border_color="@android:color/black"
+            app:border_width="2dp"
+            app:leftBottom_corner_radius="20dp"
+            app:leftTop_corner_radius="0dp"
+            app:rightBottom_corner_radius="20dp"
+            app:rightTop_corner_radius="0dp"
+            app:type="round" />
 
         <org.raphets.roundimageview.RoundImageView
             android:id="@+id/iv1"
@@ -62,12 +64,12 @@
             android:layout_height="180dp"
             android:layout_marginTop="10dp"
             android:src="@drawable/a"
-            app:border_width="3dp"
             app:border_color="@android:color/holo_red_dark"
+            app:border_width="3dp"
             app:leftBottom_corner_radius="0dp"
             app:leftTop_corner_radius="30dp"
             app:rightBottom_corner_radius="30dp"
             app:rightTop_corner_radius="0dp"
             app:type="round" />
-        </LinearLayout>
+    </LinearLayout>
 </ScrollView>

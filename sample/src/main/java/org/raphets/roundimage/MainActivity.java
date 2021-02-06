@@ -1,21 +1,24 @@
 package org.raphets.roundimage;
 
 import android.graphics.Color;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.squareup.picasso.Picasso;
+
 import org.raphets.roundimageview.RoundImageView;
 
 public class MainActivity extends AppCompatActivity {
 
-    private RoundImageView iv1,iv2,iv3,iv4;
+    private RoundImageView iv1, iv2, iv3, iv4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        RoundImageView iv1= (RoundImageView) findViewById(R.id.iv1);
+        RoundImageView iv1 = findViewById(R.id.iv1);
 
         iv1.setBorderWidth(3)
                 .setBorderColor(Color.RED)
